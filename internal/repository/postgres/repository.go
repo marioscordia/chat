@@ -7,11 +7,11 @@ import (
 	"github.com/jmoiron/sqlx"
 
 	"github.com/marioscordia/chat/internal/constants"
-	"github.com/marioscordia/chat/pkg/chat_v1"
-	repo "github.com/marioscordia/chat/repository"
+	"github.com/marioscordia/chat/internal/model"
+	repo "github.com/marioscordia/chat/internal/repository"
 )
 
-// New is ...
+// New is a function that returns ChatRepository object
 func New(ctx context.Context, db *sqlx.DB) (repo.ChatRepository, error) {
 
 	stmtDeleteChat, err := db.PreparexContext(ctx, "update chats set deleted_at=$1 where id=$2")
@@ -45,7 +45,7 @@ type repository struct {
 	stmtCreateMsg    *sqlx.Stmt
 }
 
-func (r *repository) CreateChat(ctx context.Context, chat *chat_v1.CreateRequest) (int64, error) {
+func (r *repository) CreateChat(ctx context.Context, chat *model.Chat, members []int64) (int64, error) {
 
 	t := time.Now()
 
@@ -62,17 +62,17 @@ func (r *repository) CreateChat(ctx context.Context, chat *chat_v1.CreateRequest
 	query := `insert into chats (title, creator_id, chat_type, created_at, updated_at)
 			  values ($1, $2, $3, $4, $5) returning id`
 
-	if err := tx.GetContext(ctx, &id, query, chat.ChatName, chat.CreatorId, chat.ChatType, t, t); err != nil {
+	if err := tx.GetContext(ctx, &id, query, chat.Name, chat.CreatorID, chat.Type, t, t); err != nil {
 		return 0, err
 	}
 
 	query = `insert into chat_members (chat_id, member_id, roles, created_at, updated_at)
 			 values ($1, $2, $3, $4, $5)`
 
-	if _, err := tx.ExecContext(ctx, query, id, chat.CreatorId, constants.ChannelMemberRoleAdmin, t, t); err != nil {
+	if _, err := tx.ExecContext(ctx, query, id, chat.CreatorID, constants.ChannelMemberRoleAdmin, t, t); err != nil {
 		return 0, err
 	}
-	for _, userID := range chat.UserIds {
+	for _, userID := range members {
 		if _, err := tx.ExecContext(ctx, query, id, userID, constants.ChannelMemberRoleMember, t, t); err != nil {
 			return 0, err
 		}
@@ -101,10 +101,10 @@ func (r *repository) DeleteChat(ctx context.Context, chatID int64) error {
 	return err
 }
 
-func (r *repository) CreateMessage(ctx context.Context, msg *chat_v1.Message) error {
+func (r *repository) CreateMessage(ctx context.Context, msg *model.Message) error {
 	t := time.Now()
 
-	_, err := r.stmtCreateMsg.ExecContext(ctx, msg.ChatId, msg.AuthorId, msg.Text, t, t)
+	_, err := r.stmtCreateMsg.ExecContext(ctx, msg.ChatID, msg.UserID, msg.Text, t, t)
 
 	return err
 }

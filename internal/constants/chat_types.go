@@ -1,8 +1,9 @@
 package constants
 
 const (
-	// ChatTypeDirect is ...
+	// ChatTypeDirect is direct channel type constant
 	ChatTypeDirect = "direct"
-	// ChatTypeGroup is ...
+
+	// ChatTypeGroup is group channel type constant
 	ChatTypeGroup = "group"
 )

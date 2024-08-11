@@ -2,7 +2,7 @@ package utils
 
 import "github.com/marioscordia/chat/internal/constants"
 
-// ValidChannelType is ...
+// ValidChannelType is a function that validates channel type
 func ValidChannelType(t string) bool {
 	types := []string{
 		constants.ChatTypeDirect,

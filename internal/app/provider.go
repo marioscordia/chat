@@ -11,13 +11,13 @@ import (
 	_ "github.com/lib/pq" // to initialize connection
 	"github.com/pressly/goose/v3"
 
-	"github.com/marioscordia/chat/closer"
-	"github.com/marioscordia/chat/delivery/grpc"
-	"github.com/marioscordia/chat/facility"
-	repo "github.com/marioscordia/chat/repository"
-	"github.com/marioscordia/chat/repository/postgres"
-	"github.com/marioscordia/chat/service"
-	"github.com/marioscordia/chat/service/chat"
+	"github.com/marioscordia/chat/internal/api"
+	"github.com/marioscordia/chat/internal/closer"
+	"github.com/marioscordia/chat/internal/config"
+	repo "github.com/marioscordia/chat/internal/repository"
+	"github.com/marioscordia/chat/internal/repository/postgres"
+	"github.com/marioscordia/chat/internal/service"
+	"github.com/marioscordia/chat/internal/service/chat"
 )
 
 const (
@@ -26,7 +26,7 @@ const (
 )
 
 type provider struct {
-	config *facility.Config
+	config *config.Config
 
 	db *sqlx.DB
 
@@ -34,7 +34,7 @@ type provider struct {
 
 	chatService service.ChatService
 
-	chatHandler *grpc.Handler
+	chatHandler *api.Handler
 }
 
 func newProvider() *provider {
@@ -96,9 +96,9 @@ func (p *provider) ChatService(ctx context.Context) service.ChatService {
 	return p.chatService
 }
 
-func (p *provider) ChatHandler(ctx context.Context) *grpc.Handler {
+func (p *provider) ChatHandler(ctx context.Context) *api.Handler {
 	if p.chatHandler == nil {
-		p.chatHandler = grpc.New(p.ChatService(ctx))
+		p.chatHandler = api.New(p.ChatService(ctx))
 	}
 
 	return p.chatHandler

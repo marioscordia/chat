@@ -10,8 +10,8 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/reflection"
 
-	"github.com/marioscordia/chat/closer"
-	"github.com/marioscordia/chat/facility"
+	"github.com/marioscordia/chat/internal/closer"
+	"github.com/marioscordia/chat/internal/config"
 	"github.com/marioscordia/chat/pkg/chat_v1"
 )
 
@@ -66,7 +66,7 @@ func (a *App) initProvider(_ context.Context) error {
 }
 
 func (a *App) initConfig(_ context.Context) error {
-	cfg, err := facility.NewConfig()
+	cfg, err := config.NewConfig()
 	if err != nil {
 		return err
 	}

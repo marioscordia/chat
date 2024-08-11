@@ -4,7 +4,7 @@ import (
 	"context"
 	"log"
 
-	"github.com/marioscordia/chat/app"
+	"github.com/marioscordia/chat/internal/app"
 )
 
 func main() {
