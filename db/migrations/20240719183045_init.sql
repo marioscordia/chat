@@ -6,8 +6,8 @@ create table if not exists chats (
     creator_id bigint not null,
     total_msg_count bigint default 0,
     chat_type varchar(255) not null,
-    created_at timestamp not null,
-    updated_at timestamp not null,
+    created_at timestamp not null default now(),
+    updated_at timestamp not null default now(),
     deleted_at timestamp
 );
 
@@ -16,8 +16,8 @@ create table if not exists chat_members (
     member_id bigint not null,
     msg_count bigint default 0,
     roles varchar(255) not null,
-    created_at timestamp not null,
-    updated_at timestamp not null,
+    created_at timestamp not null default now(),
+    updated_at timestamp not null default now(),
     deleted_at timestamp,
     foreign key (chat_id) references chats(id) on delete cascade
 );
@@ -27,8 +27,8 @@ create table if not exists messages (
     chat_id bigint not null,
     author_id bigint not null,
     msg_text text not null,
-    created_at timestamp not null,
-    updated_at timestamp not null,
+    created_at timestamp not null default now(),
+    updated_at timestamp not null default now(),
     deleted_at timestamp,
     foreign key (chat_id) references chats(id) on delete cascade
 );

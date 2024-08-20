@@ -13,14 +13,14 @@ import (
 // New is a function that returns Handler object
 func New(usecase service.ChatService) *Handler {
 	return &Handler{
-		usecase: usecase,
+		useCase: usecase,
 	}
 }
 
 // Handler is an object, which have methods that receive GRPC requests
 type Handler struct {
 	chat_v1.UnimplementedChatV1Server
-	usecase service.ChatService
+	useCase service.ChatService
 }
 
 // Create is the method that receives GRPC Create request
@@ -29,9 +29,9 @@ func (h *Handler) Create(ctx context.Context, req *chat_v1.CreateRequest) (*chat
 		return nil, err
 	}
 
-	chat := converter.ToChatFromCreateRequest(req)
+	chat := converter.ToChatCreateFromCreateRequest(req)
 
-	id, err := h.usecase.CreateChat(ctx, chat, req.UserIds)
+	id, err := h.useCase.CreateChat(ctx, chat)
 	if err != nil {
 		return nil, err
 	}
@@ -43,7 +43,7 @@ func (h *Handler) Create(ctx context.Context, req *chat_v1.CreateRequest) (*chat
 
 // DeleteChat is the method that receives GRPC Delete request
 func (h *Handler) DeleteChat(ctx context.Context, req *chat_v1.DeleteChatRequest) (*emptypb.Empty, error) {
-	if err := h.usecase.DeleteChat(ctx, req.Id); err != nil {
+	if err := h.useCase.DeleteChat(ctx, req.GetId()); err != nil {
 		return nil, err
 	}
 
@@ -52,7 +52,7 @@ func (h *Handler) DeleteChat(ctx context.Context, req *chat_v1.DeleteChatRequest
 
 // DeleteMember is the method that receives GRPC Delete request
 func (h *Handler) DeleteMember(ctx context.Context, req *chat_v1.DeleteMemberRequest) (*emptypb.Empty, error) {
-	if err := h.usecase.DeleteMember(ctx, req.ChatId, req.MemberId); err != nil {
+	if err := h.useCase.DeleteMember(ctx, req.GetChatId(), req.GetMemberId()); err != nil {
 		return nil, err
 	}
 
@@ -67,7 +67,7 @@ func (h *Handler) CreateMessage(ctx context.Context, req *chat_v1.Message) (*emp
 
 	msg := converter.ToMessageFromCreateRequest(req)
 
-	if err := h.usecase.CreateMessage(ctx, msg); err != nil {
+	if err := h.useCase.CreateMessage(ctx, msg); err != nil {
 		return nil, err
 	}
 

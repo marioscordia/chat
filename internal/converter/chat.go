@@ -5,11 +5,12 @@ import (
 	"github.com/marioscordia/chat/pkg/chat_v1"
 )
 
-// ToChatFromCreateRequest is the method that converts GRPC Create request to Chat model
-func ToChatFromCreateRequest(req *chat_v1.CreateRequest) *model.Chat {
-	return &model.Chat{
-		Name:      req.ChatName,
-		CreatorID: req.CreatorId,
-		Type:      req.ChatType,
+// ToChatCreateFromCreateRequest is the method that converts GRPC Create request to Chat model
+func ToChatCreateFromCreateRequest(req *chat_v1.CreateRequest) *model.ChatCreate {
+	return &model.ChatCreate{
+		Name:      req.GetChatName(),
+		CreatorID: req.GetCreatorId(),
+		Type:      req.GetChatType(),
+		UserIDs:   req.GetUserIds(),
 	}
 }

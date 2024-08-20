@@ -15,13 +15,13 @@ import (
 	"github.com/marioscordia/chat/pkg/chat_v1"
 )
 
-// App is ...
+// App is the main object that contains necessary objects and methods to run
 type App struct {
 	provider   *provider
 	grpcServer *grpc.Server
 }
 
-// NewApp is
+// NewApp is the function that returns App object
 func NewApp(ctx context.Context) (*App, error) {
 	a := &App{}
 
@@ -50,7 +50,7 @@ func (a *App) initDeps(ctx context.Context) error {
 	return nil
 }
 
-// Run is ...
+// Run is a method that starts the application
 func (a *App) Run() error {
 	defer func() {
 		closer.CloseAll()
@@ -76,12 +76,12 @@ func (a *App) initConfig(_ context.Context) error {
 	return nil
 }
 
-func (a *App) initGRPCServer(ctx context.Context) error {
+func (a *App) initGRPCServer(_ context.Context) error {
 	a.grpcServer = grpc.NewServer(grpc.Creds(insecure.NewCredentials()))
 
 	reflection.Register(a.grpcServer)
 
-	chat_v1.RegisterChatV1Server(a.grpcServer, a.provider.ChatHandler(ctx))
+	chat_v1.RegisterChatV1Server(a.grpcServer, a.provider.ChatHandler())
 
 	closer.Add(a.gracefulStop)
 

@@ -9,11 +9,11 @@ import (
 )
 
 func validateCreateChatReq(req *chat_v1.CreateRequest) error {
-	if req.ChatName == "" {
+	if req.GetChatName() == "" {
 		return errors.New("please enter chat name")
 	}
 
-	if !utils.ValidChannelType(req.ChatType) {
+	if !utils.ValidChannelType(req.GetChatType()) {
 		return errors.New("please provide correct chat type")
 	}
 
@@ -21,7 +21,7 @@ func validateCreateChatReq(req *chat_v1.CreateRequest) error {
 }
 
 func validateCreateMsgReq(req *chat_v1.Message) error {
-	if strings.TrimSpace(req.Text) == "" {
+	if strings.TrimSpace(req.GetText()) == "" {
 		return errors.New("cannot create empty message")
 	}
 

@@ -1,7 +1,6 @@
 package app
 
 import (
-	"context"
 	"database/sql"
 	"errors"
 	"fmt"
@@ -14,7 +13,7 @@ import (
 	"github.com/marioscordia/chat/internal/api"
 	"github.com/marioscordia/chat/internal/closer"
 	"github.com/marioscordia/chat/internal/config"
-	repo "github.com/marioscordia/chat/internal/repository"
+	repository "github.com/marioscordia/chat/internal/repository"
 	"github.com/marioscordia/chat/internal/repository/postgres"
 	"github.com/marioscordia/chat/internal/service"
 	"github.com/marioscordia/chat/internal/service/chat"
@@ -30,7 +29,7 @@ type provider struct {
 
 	db *sqlx.DB
 
-	chatRepo repo.ChatRepository
+	chatRepository repository.ChatRepository
 
 	chatService service.ChatService
 
@@ -59,10 +58,11 @@ func (p *provider) NewDB() *sqlx.DB {
 		}
 
 		if p.config.PostgresMigrate {
-			if err := goose.SetDialect("postgres"); err != nil {
+			if err = goose.SetDialect("postgres"); err != nil {
 				log.Fatalf("failed to set postgres dialect for goose: %v", err)
 			}
-			if err := goose.Up(db, migrationsPostgresPath); err != nil && !errors.Is(err, goose.ErrAlreadyApplied) {
+
+			if err = goose.Up(db, migrationsPostgresPath); err != nil && !errors.Is(err, goose.ErrAlreadyApplied) {
 				log.Fatalf("failed to apply migrations: %v", err)
 			}
 		}
@@ -75,30 +75,30 @@ func (p *provider) NewDB() *sqlx.DB {
 	return p.db
 }
 
-func (p *provider) ChatRepository(ctx context.Context) repo.ChatRepository {
-	if p.chatRepo == nil {
-		repo, err := postgres.New(ctx, p.NewDB())
+func (p *provider) ChatRepository() repository.ChatRepository {
+	if p.chatRepository == nil {
+		repo, err := postgres.New(p.NewDB())
 		if err != nil {
 			log.Fatalf("failed to initialize chat repository: %v", err)
 		}
 
-		p.chatRepo = repo
+		p.chatRepository = repo
 	}
 
-	return p.chatRepo
+	return p.chatRepository
 }
 
-func (p *provider) ChatService(ctx context.Context) service.ChatService {
+func (p *provider) ChatService() service.ChatService {
 	if p.chatService == nil {
-		p.chatService = chat.New(p.ChatRepository(ctx))
+		p.chatService = chat.New(p.ChatRepository())
 	}
 
 	return p.chatService
 }
 
-func (p *provider) ChatHandler(ctx context.Context) *api.Handler {
+func (p *provider) ChatHandler() *api.Handler {
 	if p.chatHandler == nil {
-		p.chatHandler = api.New(p.ChatService(ctx))
+		p.chatHandler = api.New(p.ChatService())
 	}
 
 	return p.chatHandler

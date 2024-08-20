@@ -19,8 +19,8 @@ type useCase struct {
 	repo repo.ChatRepository
 }
 
-func (u *useCase) CreateChat(ctx context.Context, chat *model.Chat, members []int64) (int64, error) {
-	return u.repo.CreateChat(ctx, chat, members)
+func (u *useCase) CreateChat(ctx context.Context, chat *model.ChatCreate) (int64, error) {
+	return u.repo.CreateChat(ctx, chat)
 }
 
 func (u *useCase) DeleteMember(ctx context.Context, chatID, memberID int64) error {
